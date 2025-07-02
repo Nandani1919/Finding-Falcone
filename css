@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finding Falcone</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid #4a90e2;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo h1 {
+            background: linear-gradient(45deg, #4a90e2, #50c878);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: linear-gradient(45deg, #4a90e2, #50c878);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            padding: 2rem 0;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #4a90e2, #50c878);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Mission Grid */
+        .mission-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Planet Cards */
+        .planet-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .planet-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(45deg, #4a90e2, #50c878);
+        }
+
+        .planet-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(74, 144, 226, 0.3);
+            border-color: #4a90e2;
+        }
+
+        .card-header h3 {
+            margin-bottom: 1rem;
+            color: #4a90e2;
+            font-size: 1.3rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #e0e0e0;
+            font-weight: 500;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
+        }
+
+        select:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        select option {
+            background: #1a1a2e;
+            color: #ffffff;
+        }
+
+        .info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .distance, .time {
+            color: #b0b0b0;
+        }
+
+        .distance-value, .time-value {
+            color: #50c878;
+            font-weight: bold;
+        }
+
+        /* Mission Summary */
+        .mission-summary {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .total-time h3 {
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            color: #50c878;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #4a90e2, #50c878);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(74, 144, 226, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Vehicle Status */
+        .vehicle-status {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .vehicle-status h4 {
+            margin-bottom: 1rem;
+            color: #4a90e2;
+            font-size: 1.3rem;
+        }
+
+        .vehicle-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .vehicle-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .vehicle-name {
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .vehicle-count {
+            background: #50c878;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-weight: bold;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .vehicle-specs {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+
+        /* Results Page */
+        .results-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .results-header h2 {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #4a90e2, #50c878);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .result-status {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .result {
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            border: 2px solid;
+        }
+
+        .result.success {
+            background: rgba(80, 200, 120, 0.1);
+            border-color: #50c878;
+        }
+
+        .result.failure {
+            background: rgba(220, 53, 69, 0.1);
+            border-color: #dc3545;
+        }
+
+        .result-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .result h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .result.success h3 {
+            color: #50c878;
+        }
+
+        .result.failure h3 {
+            color: #dc3545;
+        }
+
+        .mission-time {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .mission-time h4 {
+            color: #4a90e2;
+            font-size: 1.3rem;
+        }
+
+        .mission-summary-results {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 3rem;
+        }
+
+        .mission-summary-results h4 {
+            margin-bottom: 1.5rem;
+            color: #4a90e2;
+            font-size: 1.3rem;
+        }
+
+        .summary-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border-left: 4px solid #50c878;
+        }
+
+        .result-actions {
+            text-align: center;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* About Page */
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .about-content h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            background: linear-gradient(45deg, #4a90e2, #50c878);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .story, .planets-info, .vehicles-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .story h3, .planets-info h3, .vehicles-info h3 {
+            color: #4a90e2;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .story p {
+            margin-bottom: 1rem;
+            color: #e0e0e0;
+            line-height: 1.8;
+        }
+
+        .planet-info-list, .vehicle-info-list {
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .planet-info-item, .vehicle-info-item {
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border-left: 4px solid #50c878;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-content {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 3rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #4a90e2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-content p {
+            font-size: 1.2rem;
+            color: #ffffff;
+        }
+
+        /* Error Messages */
+        .error-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #dc3545;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            max-width: 400px;
+        }
+
+        .error-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .error-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-left: 1rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.8);
+            text-align: center;
+            padding: 2rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 3rem;
+        }
+
+        .footer p {
+            color: #b0b0b0;
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header .container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .mission-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h2 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .nav {
+                gap: 1rem;
+            }
+
+            .result-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .vehicle-item {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+
+            .summary-item {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .planet-card {
+                padding: 1rem;
+            }
+
+            .mission-summary {
+                padding: 1rem;
+            }
+
+            .vehicle-status {
+                padding: 1rem;
+            }
+
+            .logo h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>Finding Falcone</h1>
+            </div>
+            <nav class="nav">
+                <a href="#" class="nav-link active" data-page="home">Home</a>
+                <a href="#" class="nav-link" data-page="about">About</a>
+                <a href="#" class="nav-link" id="reset-btn">Reset</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Home Page -->
+        <div id="home-page" class="page active">
+            <div class="container">
+                <div class="hero">
+                    <h2>Help King Shan Find Queen Al Falcone</h2>
+                    <p>Select 4 planets to search and assign vehicles to each mission</p>
+                </div>
+
+                <div class="mission-grid">
+                    <!-- Planet Selection Cards -->
+                    <div class="planet-card" data-destination="1">
+                        <div class="card-header">
+                            <h3>Destination 1</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="planet-1">Select Planet:</label>
+                                <select id="planet-1" class="planet-select" data-index="0">
+                                    <option value="">Choose planet...</option>
+                                    <option value="Donlon">Donlon</option>
+                                    <option value="Enchai">Enchai</option>
+                                    <option value="Jebing">Jebing</option>
+                                    <option value="Sapir">Sapir</option>
+                                    <option value="Lerbin">Lerbin</option>
+                                    <option value="Pingasor">Pingasor</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="vehicle-1">Select Vehicle:</label>
+                                <select id="vehicle-1" class="vehicle-select" data-index="0" disabled>
+                                    <option value="">Choose vehicle...</option>
+                                </select>
+                            </div>
+                            <div class="info">
+                                <div class="distance">Distance: <span class="distance-value">-</span></div>
+                                <div class="time">Time: <span class="time-value">-</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="planet-card" data-destination="2">
+                        <div class="card-header">
+                            <h3>Destination 2</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="planet-2">Select Planet:</label>
+                                <select id="planet-2" class="planet-select" data-index="1">
+                                    <option value="">Choose planet...</option>
+                                    <option value="Donlon">Donlon</option>
+                                    <option value="Enchai">Enchai</option>
+                                    <option value="Jebing">Jebing</option>
+                                    <option value="Sapir">Sapir</option>
+                                    <option value="Lerbin">Lerbin</option>
+                                    <option value="Pingasor">Pingasor</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="vehicle-2">Select Vehicle:</label>
+                                <select id="vehicle-2" class="vehicle-select" data-index="1" disabled>
+                                    <option value="">Choose vehicle...</option>
+                                </select>
+                            </div>
+                            <div class="info">
+                                <div class="distance">Distance: <span class="distance-value">-</span></div>
+                                <div class="time">Time: <span class="time-value">-</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="planet-card" data-destination="3">
+                        <div class="card-header">
+                            <h3>Destination 3</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="planet-3">Select Planet:</label>
+                                <select id="planet-3" class="planet-select" data-index="2">
+                                    <option value="">Choose planet...</option>
+                                    <option value="Donlon">Donlon</option>
+                                    <option value="Enchai">Enchai</option>
+                                    <option value="Jebing">Jebing</option>
+                                    <option value="Sapir">Sapir</option>
+                                    <option value="Lerbin">Lerbin</option>
+                                    <option value="Pingasor">Pingasor</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="vehicle-3">Select Vehicle:</label>
+                                <select id="vehicle-3" class="vehicle-select" data-index="2" disabled>
+                                    <option value="">Choose vehicle...</option>
+                                </select>
+                            </div>
+                            <div class="info">
+                                <div class="distance">Distance: <span class="distance-value">-</span></div>
+                                <div class="time">Time: <span class="time-value">-</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="planet-card" data-destination="4">
+                        <div class="card-header">
+                            <h3>Destination 4</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="planet-4">Select Planet:</label>
+                                <select id="planet-4" class="planet-select" data-index="3">
+                                    <option value="">Choose planet...</option>
+                                    <option value="Donlon">Donlon</option>
+                                    <option value="Enchai">Enchai</option>
+                                    <option value="Jebing">Jebing</option>
+                                    <option value="Sapir">Sapir</option>
+                                    <option value="Lerbin">Lerbin</option>
+                                    <option value="Pingasor">Pingasor</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="vehicle-4">Select Vehicle:</label>
+                                <select id="vehicle-4" class="vehicle-select" data-index="3" disabled>
+                                    <option value="">Choose vehicle...</option>
+                                </select>
+                            </div>
+                            <div class="info">
+                                <div class="distance">Distance: <span class="distance-value">-</span></div>
+                                <div class="time">Time: <span class="time-value">-</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mission-summary">
+                    <div class="total-time">
+                        <h3>Total Time: <span id="total-time">0</span> hours</h3>
+                    </div>
+                    <button id="find-falcone-btn" class="btn btn-primary" disabled>Find Falcone!</button>
+                </div>
+
+                <div class="vehicle-status">
+                    <h4>Available Vehicles:</h4>
+                    <div class="vehicle-list">
+                        <div class="vehicle-item">
+                            <span class="vehicle-name">Space Pod</span>
+                            <span class="vehicle-count" data-vehicle="Space Pod">2</span>
+                            <span class="vehicle-specs">(Range: 200, Speed: 2)</span>
+                        </div>
+                        <div class="vehicle-item">
+                            <span class="vehicle-name">Space Rocket</span>
+                            <span class="vehicle-count" data-vehicle="Space Rocket">1</span>
+                            <span class="vehicle-specs">(Range: 300, Speed: 4)</span>
+                        </div>
+                        <div class="vehicle-item">
+                            <span class="vehicle-name">Space Shuttle</span>
+                            <span class="vehicle-count" data-vehicle="Space Shuttle">1</span>
+                            <span class="vehicle-specs">(Range: 400, Speed: 5)</span>
+                        </div>
+                        <div class="vehicle-item">
+                            <span class="vehicle-name">Space Ship</span>
+                            <span class="vehicle-count" data-vehicle="Space Ship">2</span>
+                            <span class="vehicle-specs">(Range: 600, Speed: 10)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Page -->
+        <div id="results-page" class="page">
+            <div class="container">
+                <div class="results-header">
+                    <h2>Mission Results</h2>
+                </div>
+
+                <div class="result-status">
+                    <div id="success-result" class="result success hidden">
+                        <div class="result-icon">✅</div>
+                        <h3>Success!</h3>
+                        <p>Al Falcone found on planet: <span id="found-planet">-</span></p>
+                    </div>
+
+                    <div id="failure-result" class="result failure hidden">
+                        <div class="result-icon">❌</div>
+                        <h3>Mission Failed!</h3>
+                        <p>Al Falcone was not found on any of the selected planets</p>
+                    </div>
+
+                    <div class="mission-time">
+                        <h4>Total Time Taken: <span id="result-time">0</span> hours</h4>
+                    </div>
+                </div>
+
+                <div class="mission-summary-results">
+                    <h4>Mission Summary:</h4>
+                    <div class="summary-list" id="mission-summary-list">
+                        <!-- Mission summary items will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="result-actions">
+                    <button id="start-again-btn" class="btn btn-primary">Start Again</button>
+                    <button id="home-btn" class="btn btn-secondary">Back to Home</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Page -->
+        <div id="about-page" class="page">
+            <div class="container">
+                <div class="about-content">
+                    <h2>About the Mission</h2>
+                    <div class="story">
+                        <h3>The Story</h3>
+                        <p>Queen Al Falcone is now in hiding. But if King Shan can find her before the years are up, she will be exiled for another 15 years.</p>
+                        <p>Our problem is set in the planet of Lengaburu in the distant galaxy of Tara B. After the recent war with neighbouring planet Falicornia, King Shan has exiled the Queen of Falicornia for 15 years.</p>
+                    </div>
+
+                    <div class="planets-info">
+                        <h3>Planets Information</h3>
+                        <div class="planet-info-list">
+                            <div class="planet-info-item">
+                                <strong>Donlon</strong> - Distance: 100 megamiles
+                            </div>
+                            <div class="planet-info-item">
+                                <strong>Enchai</strong> - Distance: 200 megamiles
+                            </div>
+                            <div class="planet-info-item">
+                                <strong>Jebing</strong> - Distance: 300 megamiles
+                            </div>
+                            <div class="planet-info-item">
+                                <strong>Sapir</strong> - Distance: 400 megamiles
+                            </div>
+                            <div class="planet-info-item">
+                                <strong>Lerbin</strong> - Distance: 500 megamiles
+                            </div>
+                            <div class="planet-info-item">
+                                <strong>Pingasor</strong> - Distance: 600 megamiles
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vehicles-info">
+                        <h3>Vehicles Information</h3>
+                        <div class="vehicle-info-list">
+                            <div class="vehicle-info-item">
+                                <strong>Space Pod</strong> - Quantity: 2, Max Range: 200, Speed: 2
+                            </div>
+                            <div class="vehicle-info-item">
+                                <strong>Space Rocket</strong> - Quantity: 1, Max Range: 300, Speed: 4
+                            </div>
+                            <div class="vehicle-info-item">
+                                <strong>Space Shuttle</strong> - Quantity: 1, Max Range: 400, Speed: 5
+                            </div>
+                            <div class="vehicle-info-item">
+                                <strong>Space Ship</strong> - Quantity: 2, Max Range: 600, Speed: 10
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="loading-overlay hidden">
+            <div class="loading-content">
+                <div class="loading-spinner"></div>
+                <p>Searching for Al Falcone...</p>
+            </div>
+        </div>
+
+        <!-- Error Messages -->
+        <div id="error-message" class="error-message hidden">
+            <div class="error-content">
+                <span class="error-text"></span>
+                <button class="error-close">&times;</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 GeekTrust Challenge - Finding Falcone</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mock data
+        const planetsData = [
+            { name: 'Donlon', distance: 100 },
+            { name: 'Enchai', distance: 200 },
+            { name: 'Jebing', distance: 300 },
+            { name: 'Sapir', distance: 400 },
+            { name: 'Lerbin', distance: 500 },
+            { name: 'Pingasar', distance: 600 }
+        ];
+
+        const vehiclesData = [
+            { name: 'Space Pod', total_no: 2, max_distance: 200, speed: 2 },
+            { name: 'Space Rocket', total_no: 1, max_distance: 300, speed: 4 },
+            { name: 'Space Shuttle', total_no: 1, max_distance: 400, speed: 5 },
+            { name: 'Space Ship', total_no: 2, max_distance: 600, speed: 10 }
+        ];
+
+        // Add your JavaScript logic here
+        // This is just the basic structure - you'll need to implement the functionality
+    </script>
+</body>
+</html>
