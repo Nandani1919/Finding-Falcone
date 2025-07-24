@@ -8,6 +8,14 @@ Queen Al Falcone is in hiding after the war with planet Falicornia. King Shan ha
 
 Your mission: Help King Shan select 4 planets and appropriate vehicles to find Queen Al Falcone!
 
+---
+
+## 🚀 Live Preview
+
+👉 https://chimerical-gingersnap-ebd9f9.netlify.app/
+
+---
+
 ## 🚀 Features
 
 - **Planet Selection**: Choose 4 out of 6 available planets to search
